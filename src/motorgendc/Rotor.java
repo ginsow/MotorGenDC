@@ -19,7 +19,7 @@ public class Rotor extends JPanel implements Runnable {
     //Parámetros
     private int w;      //Velocidad (r.p.m)
     private double gradseg; //grados rotados por segundo
-    
+
     private int x, y;                   //Posición del rotor
     private Panel panel_rotor;          //Panel del rotor 
 
@@ -27,7 +27,7 @@ public class Rotor extends JPanel implements Runnable {
     private boolean enPausa;
     private boolean detenido;
     private long time_sleep;
-    
+
     private ImageIcon rotor = new ImageIcon(
             getClass().getResource("/imagenes/engine.png"));
 
@@ -39,14 +39,14 @@ public class Rotor extends JPanel implements Runnable {
         enPausa = false;
         detenido = false;
         this.w = w;
-        
-        if (w==0){
-            //mov = true;
-            detenido=true;
-        }
-        
+
         gradseg = 6;
-        time_sleep = Math.round(1000 / w);
+        try {
+            time_sleep = Math.round(1000 / w);
+        } catch (Exception e) {
+            detenido = true;
+        }
+
         this.x = x;
         this.y = y;
         this.panel_rotor = panel_r;
@@ -63,18 +63,18 @@ public class Rotor extends JPanel implements Runnable {
         //Si hay movimiento, rota a la velocidad indicada
         if (!detenido) {
 
-            g2d.rotate(Math.toRadians(gradseg), 150, 150);
+            g2d.rotate(Math.toRadians(gradseg),
+                    rotor.getIconWidth() / 2,
+                    rotor.getIconHeight() / 2);
             g2d.drawImage(rotor.getImage(), 0, 0,
                     getWidth(), getHeight(), this);
 
         } else {
 
             //si no hay movimiento, solo imprime la imagen
-            grphcs.drawImage(
-                    rotor.getImage(),
-                    0, 0,
-                    getWidth(), getHeight(),
-                    this
+            g2d.drawImage(
+                    rotor.getImage(), 0, 0,
+                    getWidth(), getHeight(), this
             );
 
         }
@@ -90,20 +90,18 @@ public class Rotor extends JPanel implements Runnable {
     @Override
     public void run() {
         while (!detenido) {
-            
+
             try {
-                if(!enPausa){
-                GirarRotor();
-                Thread.sleep(time_sleep);
+                if (!enPausa) {
+                    GirarRotor();
+                    Thread.sleep(time_sleep);
                 } else {
-            
+
                 }
             } catch (InterruptedException e) {
                 System.out.println("Falla");
             }
-            
-            
-            
+
         }
 
     }
