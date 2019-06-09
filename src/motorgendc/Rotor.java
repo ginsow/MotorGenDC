@@ -19,13 +19,11 @@ public class Rotor extends JPanel implements Runnable {
     //Parámetros
     private int w;      //Velocidad (r.p.m)
     private double gradseg; //grados rotados por segundo
-    
 
     private int x, y;                   //Posición del rotor
     private Panel panel_rotor;          //Panel del rotor 
 
     //atributos asociados al hilo
-    private boolean enPausa;
     private boolean detenido;
     private long time_sleep;
 
@@ -37,7 +35,6 @@ public class Rotor extends JPanel implements Runnable {
     public Rotor(int x, int y, Panel panel_r, int w) {
 
         super();
-        enPausa = false;
         detenido = false;
         this.w = w;
 
@@ -55,16 +52,14 @@ public class Rotor extends JPanel implements Runnable {
         setOpaque(false);
 
     }
-    
-        
+
     @Override
     protected void paintComponent(Graphics grphcs) {
         super.paintComponent(grphcs); //to change body of generated
         Graphics2D g2d = (Graphics2D) grphcs;
 
-        //Si hay movimiento, rota a la velocidad indicada
         if (!detenido) {
-
+            //Si hay movimiento, rota a la velocidad indicada
             g2d.rotate(Math.toRadians(gradseg),
                     rotor.getIconWidth() / 2,
                     rotor.getIconHeight() / 2);
@@ -73,7 +68,7 @@ public class Rotor extends JPanel implements Runnable {
 
         } else {
 
-            //si no hay movimiento, solo imprime la imagen
+            //Si no hay movimiento, solo imprime la imagen
             g2d.drawImage(
                     rotor.getImage(), 0, 0,
                     getWidth(), getHeight(), this
@@ -94,12 +89,8 @@ public class Rotor extends JPanel implements Runnable {
         while (!detenido) {
 
             try {
-                if (!enPausa) {
-                    GirarRotor();
-                    Thread.sleep(time_sleep);
-                } else {
-
-                }
+                GirarRotor();
+                Thread.sleep(time_sleep);
             } catch (InterruptedException e) {
                 System.out.println("Falla");
             }
