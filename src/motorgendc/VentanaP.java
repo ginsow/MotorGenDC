@@ -39,60 +39,60 @@ public class VentanaP extends JFrame {
         this.ancho = 342 * 3;
         panel_maquinas = new Panel();
 
-        setTitle("Motor/Generador DC");
-        setSize(500, 500);
+        setTitle("Motor/Generador DC");             //Nombre de la ventana
+        setSize(500, 500);                          //Dimensiones iniciales
+        setLocationRelativeTo(null);                //Ubicación central (siempre)
+        setDefaultCloseOperation(EXIT_ON_CLOSE);    //Operación close
+        Container contenedor = getContentPane();    //Creación del contenedor
+        contenedor.setLayout(new BorderLayout());   //Asignación del BorderLayout
 
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        Container contenedor = getContentPane();
-        contenedor.setLayout(new BorderLayout());
+        //CONFIGURACIÓN DEL PANEL NORTE
+        panel_norte = new JPanel();         //Creación del panel norte
 
-        //estableciendo el panel del norte
-        panel_norte = new JPanel();
-
-        n_txt = new JTextField();
+        n_txt = new JTextField();           //Creación de casilla de generación
         n_txt.setColumns(5);
 
-        panel_norte.add(n_txt);
+        panel_norte.add(n_txt);             //Adición de casilla      
 
-        jButton1 = new JButton();
+        jButton1 = new JButton();           //Creación de botón Generar
         jButton1.setText("Generar");
-        jButton1.addActionListener(new Oyente());
-        panel_norte.add(jButton1);
+        jButton1.addActionListener(new Oyente());   //Asignación de operación
+        panel_norte.add(jButton1);                  //Adición del botón
 
-        add(panel_norte, BorderLayout.NORTH);
+        add(panel_norte, BorderLayout.NORTH);       //Adición del panel norte
 
-        //estableciendo el panel central
-        panel_centro = new JPanel();
-        panel_centro.setLayout(new GridLayout());
-        panel_centro.setBounds(0, 0,
+        //CONFIGURACIÓN DEL PANEL CENTRAL
+        panel_centro = new JPanel();                //Creación del panel centro
+        panel_centro.setLayout(new GridLayout());   //Asignación de GridLayout
+        panel_centro.setBounds(0, 0, //Dimensiones del panel
                 panel_maquinas.getWidth(),
                 panel_maquinas.getHeight());
-        add(panel_centro, BorderLayout.CENTER);
+        add(panel_centro, BorderLayout.CENTER);     //Asignación del panel
 
     }
 
-    //gestion del evento
+    //Gestión del evento para generar pares motor/generador
     private class Oyente implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent me) {
 
-            Integer n = Integer.parseInt(n_txt.getText());
-            panel_centro.removeAll();
-            panel_centro.setLayout(new GridLayout(n, 1));
+            Integer n = Integer.parseInt(n_txt.getText());  //Obtención de n pares
+            panel_centro.removeAll();                       //Remueve componentes
+            panel_centro.setLayout(new GridLayout(n, 1));   //Asignación
 
             vector = new ArrayList<>(n);
             for (int i = 0; i < n; i++) {
 
-                panel_maquinas = new Panel();
-                vector.add(panel_maquinas);
-                resize(ancho, altura + (n - 1) * 342);
-                setLocationRelativeTo(null);
-                panel_centro.add(panel_maquinas);
+                panel_maquinas = new Panel();           //Creación de panel_maquinas
+                vector.add(panel_maquinas);             //Adición al vector
+                resize(ancho, altura + (n - 1) * 342);  //Nueva dimensión
+                setResizable(false);                    //No se podrá redimensionar
+                setLocationRelativeTo(null);            //Ubicación central
+                panel_centro.add(panel_maquinas);       //Adición del panel
 
             }
-            panel_centro.validate();
+            panel_centro.validate();                //Validación de componentes
         }
     }
 

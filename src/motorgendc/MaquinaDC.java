@@ -5,14 +5,12 @@
  */
 package motorgendc;
 
-
 /**
  *
  * @author SYSTEM
  */
 public class MaquinaDC {
-    
-    
+
     //parametros
     private double Vt;
     private double IL;
@@ -24,9 +22,9 @@ public class MaquinaDC {
     private double L;
     private double w;
     private double Ieq;
-    
+
     private double Rcarga;
-    
+
     private double Va;
     private double Ea;
     private double Ra;
@@ -34,117 +32,110 @@ public class MaquinaDC {
     private int Ns;
     private double Rs;
     private double Rarr;
-    
+
     private double Rf;
     private double Vf;
     private int Nf;
     private double If;
-    
+
     private double Te;
     private double Tf;
-    
-    private double Tabla[][]= {{0,1,2,3,4,5,6,7,8,9},{5,60,120,170,220,250,275,295,310,320}};
-    private double Wtabla;
+
+    private double Tabla[][] = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, {5, 60, 120, 170, 220, 250, 275, 295, 310, 320}};
+    private double Wtabla = 1200;
     private int Iftabla;
-    
-     
-    
-    public void generador(int tipo){
-        
-        
-        switch (tipo){
+    private double K_fi;
+
+    public MaquinaDC() {
+
+    }
+
+    public void generador(int tipo) {
+
+        switch (tipo) {
             case 1:
                 //excitacion separada
-        
-                //in: Vf , W , Carga (o W y Vt) ; out: Vt (o Vf)
-                
-                
-                If= Vf/Rf;
-                Iftabla = (int)Math.round(If);
-                Ea= buscar(Tabla,Iftabla);
-                
-                
-                Ia= Ea / (Ra + Rcarga);
-                Vt = Ea - Ia*Ra;
-                
+
+                //in: Vf , W , Carga (o W y Vt) ; out: Vt (o Vf) 
+                If = Vf / Rf;
+                Iftabla = (int) Math.round(If);
+                Ea = buscar(Tabla, Iftabla);
+
+                Ia = Ea / (Ra + Rcarga);
+                Vt = Ea - Ia * Ra;
+
                 break;
             case 2:
                 //en derivacion
-                
-                
+
                 /*
                 Ia = If+ IL;
                 Vt = Ea - Ia*Ra;
-                */
-                
+                 */
                 break;
-            case 3: 
+            case 3:
                 //serie
-                
+
                 /*
                 Vt = Ea - Ia*(Ra+Rs);
                 break;
-                */
+                 */
                 break;
             case 4:
-                 //compuesto
-                
+                //compuesto
+
                 /*
                 Ieq = If + (Ns/Nf)* Ia ;
-                */
-                
+                 */
                 break;
         }
-  
+
     }
-    
-    public void motor(int tipo){
-        
-        
-        switch (tipo){
+
+    public void motor(int tipo) {
+
+        switch (tipo) {
             case 1:
                 //excitacion separada
-                
+
                 //in: Vt , Vf, Tf ; out W , TL
-                
-                If= Vf/Rf;
+                If = Vt / Rf;
                 //Ea = K*fi*w;
-                Ea= buscar(Tabla, Iftabla);                
-                Ia= (Vt - Ea)/Ra ;
-                //Te = K*fi*Ia;
-                Te=Tf;
-                w= (Vt/(Ea/Wtabla))- Te*(Ra/Math.pow((Ea/Wtabla),2));
+                Ea = buscar(Tabla, Iftabla);
+                Ia = (Vt - Ea) / Ra;
+                K_fi = Ea/Wtabla;
+                Te = K_fi*Ia;
+                //Te = Tf;
+                w = (Vt / (Ea / Wtabla)) - Te * (Ra / Math.pow((Ea / Wtabla), 2));
 
                 break;
             case 2:
                 //en derivacion
 
                 break;
-                
-            case 3:                
+
+            case 3:
                 //serie        
-                
-                break;                
+
+                break;
             case 4:
-                 //compuesto
-               
-                break; 
-    }   
-}
-    
-    public double buscar(double M[][], double I){
-    
+                //compuesto
+
+                break;
+        }
+    }
+
+    public double buscar(double M[][], double I) {
+
         for (int i = 0; i < M.length; i++) {
-            
-            if(I  == M[i][0]){
+
+            if (I == M[0][i]) {
                 return M[1][i];
             }
-            
+
         }
-        
-        
-    return -1;
+
+        return -1;
     }
-    
-    
+
 }
