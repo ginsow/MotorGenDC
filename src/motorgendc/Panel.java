@@ -5,28 +5,27 @@
  */
 package motorgendc;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.concurrent.*;
+import javax.swing.*;
 
 public class Panel extends JPanel {
 
     private ExecutorService threadPool;
     private Rotor rotorg, rotorm;
-
+    private MaquinaDC maquina;
+    
+    //Declaración de variables del Java.Swing
     JPanel panel_izquierdo, panel_central, panel_derecho;
     JLabel CMotor, CGen;                //Etiquetas de control
     JPanel panelM, panelG;              //Paneles de control FlowLayout de panel_derecho
     JTextField Vtm_txt, W_txt;          //Casillas de entrada y salida MOTOR
     JLabel txt1, txt2, txt3, txt4;      //Nombres de los componentes
     JTextField Vfg_txt, Vtg_txt;        //Casillas de entrada y salida2 GEN
+    JButton Control;                     //Boton de control
 
-    private int WMotor;
+    private int Wmg, Vtg;
 
     public Panel() {
 
@@ -36,7 +35,7 @@ public class Panel extends JPanel {
 
         //CONFIGURACIÓN DEL PANEL DERECHO
         panel_derecho = new JPanel();                   //Creación del panel_derecho
-        panel_derecho.setLayout(new GridLayout(4, 1));  //Asignación de GridL
+        panel_derecho.setLayout(new GridLayout(5, 1));  //Asignación de GridL
 
         //Creación de los nombres de componentes
         txt1 = new JLabel();
@@ -44,9 +43,9 @@ public class Panel extends JPanel {
         txt3 = new JLabel();
         txt4 = new JLabel();
         //Asignación de nombres de componentes
-        txt1.setText("Tensión de terminales: ");
-        txt2.setText("Velocidad de salida del motor: ");
-        txt3.setText("Tensión del inductor: ");
+        txt1.setText("Tensión de terminales:                 ");
+        txt2.setText("Velocidad de salida del motor:   ");
+        txt3.setText("Tensión del inductor:                       ");
         txt4.setText("Tensión de salida del generador: ");
 
         //Controles Motor
@@ -64,7 +63,7 @@ public class Panel extends JPanel {
         Vtm_txt.setColumns(5);
         W_txt = new JTextField();       //Salida de velocidad del motor
         W_txt.setColumns(5);
-        W_txt.setEnabled(false);        //No puede ser configurada directamente
+        //W_txt.setEnabled(false);        //No puede ser configurada directamente
 
         //Adición de componentes del motor al panel FlowLayout
         panelM.add(txt1);
@@ -99,10 +98,18 @@ public class Panel extends JPanel {
 
         panel_derecho.add(panelG);      //Adición del panel de componentes del gen
 
+        //Boton de control
+        Control = new JButton();
+        Control.setText("Agregar");
+        Control.addActionListener(new OyenteC());
+        panel_derecho.add(Control);
+
+        //--------------------------------------------------------------------//
+        
         //CONFIGURACIÓN DEL PANEL IZQUIERDO MOTOR
         panel_izquierdo = new JPanel();             //Creación del panel contenedor
         panel_izquierdo.setLayout(new BorderLayout());  //Asignación BorderLayout
-        rotorm = new Rotor(0, 0, Panel.this, 0);        //Llamado a RotorM
+        rotorm = new Rotor(0, 0, Panel.this, Wmg);      //Llamado a RotorM
         panel_izquierdo.setBounds(0, 0,
                 rotorm.getWidth(),
                 rotorm.getHeight());
@@ -111,7 +118,7 @@ public class Panel extends JPanel {
         //CONFIGURACIÓN DEL PANEL CENTRAL GENERADOR
         panel_central = new JPanel();               //Creación del panel contenedor
         panel_central.setLayout(new BorderLayout());    //Asignación BorderLayout
-        rotorg = new Rotor(0, 0, Panel.this, 100);      //Llamado a RotorG
+        rotorg = new Rotor(0, 0, Panel.this, Wmg);      //Llamado a RotorG
         panel_central.setBounds(0, 0,
                 rotorg.getWidth(),
                 rotorg.getHeight());
@@ -122,13 +129,66 @@ public class Panel extends JPanel {
         add(panel_central);
         add(panel_derecho);
 
-        //Ejecución de hilos 
-        threadPool.execute(rotorm);
-        threadPool.execute(rotorg);
     }
 
-    public void CalculoMotor() {
+    //Metodo para calcular salidas del sistema
+    public void Calculo() {
 
+        try {
+            
+            //Creación del objeto con el constructor MaquinaDC(), recibiendo
+            //los parametros de los TextField
+            maquina = new MaquinaDC(
+                    Integer.parseInt(Vtm_txt.getText()),
+                    Integer.parseInt(Vfg_txt.getText())
+            );
+            
+            //Llamador a los metodos de maquina para generar entradas y salidas
+            maquina.motor(1);
+            maquina.generador(1);
+            
+            //Asignación de salidas de los metodos
+            Wmg = (int) maquina.getW();
+            Vtg = (int) maquina.getVtg();
+            
+            //Escritura de los resultados en las casillas de TextField
+            //W_txt.setText(String.valueOf(Wmg));
+            Vtg_txt.setText(String.valueOf(Vtg));
+
+        } catch (NumberFormatException e) {
+            //Si uno de los valores es erroneo (no escrito aún)
+            JOptionPane.showMessageDialog(null, "Valores erroneos",
+                    "ERROR DE COMPONENTE", JOptionPane.WARNING_MESSAGE);
+        }
+
+    }
+
+    //Clase OyenteC que acciona el boton Agregar
+    private class OyenteC implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            Calculo();              //Calculo con parametros nuevos
+
+            panel_central.remove(rotorg);       //Se remueve el contenido de los
+            panel_izquierdo.remove(rotorm);     //paneles, sino se pintaría encima
+            
+            //Nueva escritura de los rotores
+            rotorg = new Rotor(0, 0, Panel.this,
+                    Integer.parseInt(W_txt.getText()));
+            rotorm = new Rotor(0, 0, Panel.this,
+                    Integer.parseInt(W_txt.getText()));
+            
+            //Adición a los paneles
+            panel_central.add(rotorg);
+            panel_izquierdo.add(rotorm);
+
+            //Ejecución de hilos 
+            threadPool.execute(rotorm);
+            threadPool.execute(rotorg);
+
+        }
     }
 
 }

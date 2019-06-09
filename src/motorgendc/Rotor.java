@@ -5,10 +5,8 @@
  */
 package motorgendc;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
+import java.awt.*;
+import javax.swing.*;
 
 /**
  *
@@ -35,12 +33,13 @@ public class Rotor extends JPanel implements Runnable {
     public Rotor(int x, int y, Panel panel_r, int w) {
 
         super();
-        detenido = false;
+        //detenido = false;
         this.w = w;
 
         gradseg = 6;
         try {
             time_sleep = Math.round(1000 / w);
+            detenido = false;
         } catch (Exception e) {
             detenido = true;
         }
