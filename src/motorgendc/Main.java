@@ -3,7 +3,9 @@
 package motorgendc;
 
 /**
- * @author Cerjio
+ * @author 
+ * José Pérez  
+ * Sergio Nava 26.389.956
  */
 public class Main {
 

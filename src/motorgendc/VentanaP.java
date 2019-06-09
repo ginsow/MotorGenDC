@@ -5,9 +5,6 @@
  */
 package motorgendc;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import javax.swing.JFrame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
