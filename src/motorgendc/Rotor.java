@@ -19,6 +19,7 @@ public class Rotor extends JPanel implements Runnable {
     //Parámetros
     private int w;      //Velocidad (r.p.m)
     private double gradseg; //grados rotados por segundo
+    
 
     private int x, y;                   //Posición del rotor
     private Panel panel_rotor;          //Panel del rotor 
@@ -54,7 +55,8 @@ public class Rotor extends JPanel implements Runnable {
         setOpaque(false);
 
     }
-
+    
+        
     @Override
     protected void paintComponent(Graphics grphcs) {
         super.paintComponent(grphcs); //to change body of generated

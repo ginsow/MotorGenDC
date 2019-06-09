@@ -11,6 +11,10 @@ package motorgendc;
  */
 public class Estator  {
     
+    
+    
+    
+    
     public Estator(){
         
         
