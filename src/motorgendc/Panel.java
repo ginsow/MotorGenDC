@@ -10,6 +10,11 @@ import java.awt.event.*;
 import java.util.concurrent.*;
 import javax.swing.*;
 
+/**
+ *
+ * @author SYSTEM
+ */
+
 public class Panel extends JPanel {
 
     private ExecutorService threadPool;
@@ -62,8 +67,8 @@ public class Panel extends JPanel {
         Vtm_txt = new JTextField();     //Entrada de tensión en terminales del motor
         Vtm_txt.setColumns(5);
         W_txt = new JTextField();       //Salida de velocidad del motor
-        W_txt.setColumns(5);
-        //W_txt.setEnabled(false);        //No puede ser configurada directamente
+        W_txt.setColumns(8);
+        W_txt.setEnabled(false);        //No puede ser configurada directamente
 
         //Adición de componentes del motor al panel FlowLayout
         panelM.add(txt1);
@@ -142,17 +147,9 @@ public class Panel extends JPanel {
                     Integer.parseInt(Vtm_txt.getText()),
                     Integer.parseInt(Vfg_txt.getText())
             );
-            
-            //Llamador a los metodos de maquina para generar entradas y salidas
-            maquina.motor(1);
-            maquina.generador(1);
-            
-            //Asignación de salidas de los metodos
-            Wmg = (int) maquina.getW();
-            Vtg = (int) maquina.getVtg();
-            
+
             //Escritura de los resultados en las casillas de TextField
-            //W_txt.setText(String.valueOf(Wmg));
+            W_txt.setText(String.valueOf(Wmg));
             Vtg_txt.setText(String.valueOf(Vtg));
 
         } catch (NumberFormatException e) {
@@ -174,12 +171,22 @@ public class Panel extends JPanel {
             panel_central.remove(rotorg);       //Se remueve el contenido de los
             panel_izquierdo.remove(rotorm);     //paneles, sino se pintaría encima
             
+            //Llamado a Ejecucion de las ecuaciones
+            maquina.motor(1, Double.parseDouble(Vtm_txt.getText()));
+            Wmg = (int) maquina.getWm();
+            maquina.generador(1, Double.parseDouble(Vfg_txt.getText()),Wmg);
+            Vtg = (int) maquina.getVtg();
+            
             //Nueva escritura de los rotores
             rotorg = new Rotor(0, 0, Panel.this,
-                    Integer.parseInt(W_txt.getText()));
+                    (Wmg/4));
             rotorm = new Rotor(0, 0, Panel.this,
-                    Integer.parseInt(W_txt.getText()));
+                    Wmg);
             
+            //Actualizacion de valores
+            W_txt.setText(Wmg + " rad/s");
+            Vtg_txt.setText(Vtg + " v");
+                    
             //Adición a los paneles
             panel_central.add(rotorg);
             panel_izquierdo.add(rotorm);

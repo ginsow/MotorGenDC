@@ -5,6 +5,8 @@
  */
 package motorgendc;
 
+
+
 /**
  *
  * @author SYSTEM
@@ -13,20 +15,13 @@ public class MaquinaDC {
 
     //parametros
     private double Vtm, Vtg;
-    private double IL;
-    private double H;
-    private double fi;
-    private double B;
-    private double A;
-    private double K;
-    private double L;
-    private double w;
-    private double Ieq;
+    private double Wm , Wg;
+    //private double IL, H, fi, B, A, K, L, Ieq;
 
     private double Rcarga = 100;
 
     private double Va;
-    private double Ea;
+    private double Ea; 
     private double Ra = 0.025;
     private double Ia;
     private int Ns;
@@ -39,15 +34,18 @@ public class MaquinaDC {
     private double If;
 
     private double Te;
-    private double Tf;
+    private double Tf = 75;
+    private double inercia = 1;
 
     private double Tabla[][] = {
         {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
         {5, 60, 120, 170, 220, 250, 275, 295, 310, 320}};
     private double Wtabla = 100;
+    private double Etabla;
     private int Iftabla;
     private double K_fi;
-
+    
+    
     public MaquinaDC(int Vtm, int Vfg) {
         
         this.Vtm = Vtm;
@@ -55,8 +53,52 @@ public class MaquinaDC {
     
     }
 
-    public void generador(int tipo) {
+    public void motor(int tipo, double Vmot){
+        this.Vtm = Vmot;
+        
+        
+        switch (tipo) {
+            case 1:
+                //excitacion separada
 
+                //in: Vt , Vf, Tf ; out W , TL
+                If = Vtm / Rf;
+                Iftabla = (int) Math.round(If);
+                Ea = buscar(Tabla, Iftabla);
+                K_fi = Ea/Wtabla;
+                calculovelocidad();
+                
+                
+                //Ea = K_fi*Wm;                
+                //Ia = (Vtm - Ea) / Ra;               
+                //Te = K_fi*Ia;
+                //Te = Tf;
+                //Wm = (Vtm / (Ea / Wtabla)) - Te * (Ra / Math.pow((Ea / Wtabla), 2));
+                //Wm = Ea/K_fi;
+                
+                //Wm = Te*1.2;
+                break;
+            case 2:
+                //en derivacion
+
+                break;
+
+            case 3:
+                //serie        
+
+                break;
+            case 4:
+                //compuesto
+
+                break;
+        }
+    }
+
+    public void generador(int tipo, double Vind, double Wgen) {
+        
+        this.Vfg = Vind;
+        this.Wg = Wgen;
+        
         switch (tipo) {
             case 1:
                 //excitacion separada
@@ -64,7 +106,8 @@ public class MaquinaDC {
                 //in: Vf , W , Carga (o W y Vt) ; out: Vt (o Vf) 
                 If = Vfg / Rf;
                 Iftabla = (int) Math.round(If);
-                Ea = buscar(Tabla, Iftabla);
+                Etabla = buscar(Tabla, Iftabla);
+                Ea = Etabla*(Wg/Wtabla);
 
                 Ia = Ea / (Ra + Rcarga);
                 Vtg = Ea - Ia * Ra;
@@ -97,42 +140,9 @@ public class MaquinaDC {
 
     }
 
-    public void motor(int tipo) {
-
-        switch (tipo) {
-            case 1:
-                //excitacion separada
-
-                //in: Vt , Vf, Tf ; out W , TL
-                If = Vtm / Rf;
-                //Ea = K*fi*w;
-                Ea = buscar(Tabla, Iftabla);
-                Ia = (Vtm - Ea) / Ra;
-                K_fi = Ea/Wtabla;
-                Te = K_fi*Ia;
-                //Te = Tf;
-                w = (Vtm / (Ea / Wtabla)) - Te * (Ra / Math.pow((Ea / Wtabla), 2));
-
-                break;
-            case 2:
-                //en derivacion
-
-                break;
-
-            case 3:
-                //serie        
-
-                break;
-            case 4:
-                //compuesto
-
-                break;
-        }
-    }
-
     public double buscar(double M[][], double I) {
 
-        for (int i = 0; i < M.length; i++) {
+        for (int i = 0; i < M[0].length; i++) {
 
             if (I == M[0][i]) {
                 return M[1][i];
@@ -147,8 +157,22 @@ public class MaquinaDC {
         return Vtg;
     }
 
-    public double getW() {
-        return w;
+    public double getWm() {
+        return Wm;
+    }
+
+    
+
+    private void calculovelocidad() {
+        Ia = Vtm / Ra;
+        Te = K_fi*Ia;
+        
+        if(Te>Tf){
+            Ia = Tf / K_fi;
+            Ea = Vtm - Ia*Ra;
+            Wm = Ea / K_fi;
+        } 
+        
     }
 
  
