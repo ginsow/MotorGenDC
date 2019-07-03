@@ -16,14 +16,14 @@ public class Rotor extends JPanel implements Runnable {
 
     //Parámetros
     private int w;      //Velocidad (r.p.m)
-    private double gradseg; //grados rotados por segundo
-
+   
     private int x, y;                   //Posición del rotor
     private Panel panel_rotor;          //Panel del rotor 
 
     //atributos asociados al hilo
     private boolean detenido;
     private long time_sleep;
+    private boolean enPausa;
 
     private ImageIcon rotor = new ImageIcon(
             getClass().getResource("/imagenes/engine.png"));
@@ -36,7 +36,7 @@ public class Rotor extends JPanel implements Runnable {
         //detenido = false;
         this.w = w;
 
-        gradseg = 6;
+        //gradseg = 1;
         try {
             time_sleep = Math.round(1000 / w);
             detenido = false;
@@ -52,6 +52,13 @@ public class Rotor extends JPanel implements Runnable {
 
     }
 
+    private void GirarRotor() {
+
+        i++;
+        repaint();
+
+    }
+
     @Override
     protected void paintComponent(Graphics grphcs) {
         super.paintComponent(grphcs); //to change body of generated
@@ -59,7 +66,7 @@ public class Rotor extends JPanel implements Runnable {
 
         if (!detenido) {
             //Si hay movimiento, rota a la velocidad indicada
-            g2d.rotate(Math.toRadians(gradseg),
+            g2d.rotate(Math.toRadians(6*i),
                     rotor.getIconWidth() / 2,
                     rotor.getIconHeight() / 2);
             g2d.drawImage(rotor.getImage(), 0, 0,
@@ -70,32 +77,54 @@ public class Rotor extends JPanel implements Runnable {
             //Si no hay movimiento, solo imprime la imagen
             g2d.drawImage(
                     rotor.getImage(), 0, 0,
-                    getWidth(), getHeight(), this
-            );
+                    getWidth(), getHeight(), this);
 
         }
-    }
-
-    private void GirarRotor() {
-
-        gradseg = 6 * (i++);
-        repaint();
-
     }
 
     @Override
     public void run() {
+
         while (!detenido) {
 
             try {
-                GirarRotor();
+                if (!enPausa) {
+                    GirarRotor();
+                }
                 Thread.sleep(time_sleep);
             } catch (InterruptedException e) {
-                System.out.println("Falla");
+                //System.out.println("Falla");
             }
 
         }
 
+        i = 0;
+        repaint();
+
+    }
+
+    public boolean isEnPausa() {
+        return enPausa;
+    }
+
+    public void setEnPausa(boolean enPausa) {
+        this.enPausa = enPausa;
+    }
+
+    public boolean isDetenido() {
+        return detenido;
+    }
+
+    public void setDetenido(boolean detenido) {
+        this.detenido = detenido;
+    }
+
+    public int getI() {
+        return i;
+    }
+
+    public void setI(int i) {
+        this.i = i;
     }
 
 }
